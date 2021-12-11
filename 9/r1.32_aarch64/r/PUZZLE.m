@@ -1,31 +1,19 @@
 PUZZLE
-	GOTO PartOne
-	; AUTHOR: Alex Savage
-	; PURPOSE: Solve puzzle
-PartOne
-	NEW X,Y,Value,NeighborX,NeighborY,NeighborVal,Risk
-	SET Risk=0
-	FOR X=1:1:100 FOR Y=1:1:100 DO
-	. SET Value=^MAP(X,Y)
-	. QUIT:'$$Compare(Value,X-1,Y)
-	. QUIT:'$$Compare(Value,X+1,Y)
-	. QUIT:'$$Compare(Value,X,Y-1)
-	. QUIT:'$$Compare(Value,X,Y+1)
-	. SET Risk=Risk+Value+1 
-	WRITE Risk
-	QUIT
-Compare(Value,X,Y)
-	IF '$DATA(^MAP(X,Y)) QUIT 1 
-	QUIT (^MAP(X,Y)>Value)
-PartTwo
-	;	
-Load(File)
-	NEW X,Y,Line
-	OPEN File:READONLY
-	USE File
-	FOR X=1:1:100 READ Line FOR Y=1:1:100 SET ^MAP(X,Y)=$EXTRACT(Line,Y)
-	USE 0
-	CLOSE File
-	QUIT
-	QUIT
+	n X,Y,Map,Value,NeighborX,NeighborY,NeighborVal,Risk
+	s Risk=0
+	w !,"Input (100x100):",!
+	f X=1:1:100 r Line f Y=1:1:100 s Map(X,Y)=$e(Line,Y)
+	f X=1:1:100 f Y=1:1:100 DO
+	. s Value=Map(X,Y)
+	. q:'$$Compare(.Map,Value,X-1,Y)
+	. q:'$$Compare(.Map,Value,X+1,Y)
+	. q:'$$Compare(.Map,Value,X,Y-1)
+	. q:'$$Compare(.Map,Value,X,Y+1)
+	. s Risk=Risk+Value+1 
+	w !,"Risk: ",Risk
+	q
+Compare(Map,Value,X,Y)
+	i '$d(Map(X,Y)) q 1 
+	q (Map(X,Y)>Value)
+	q
 	;
