@@ -1,10 +1,23 @@
 OCTO
-	n map,total,line,n,x,y
+Puzzle1
+	n map,total
 	s total=0
+	d read(.map)
+	f %=1:1:100 s total=total+$$step(.map)
+	w !,"Total flashes after 100 steps: ",total
+	q
+Puzzle2
+	n map,step
+	s step=0
+	d read(.map)
+	w !
+	f  s step=step+1,%=$$step(.map) q:$$full(.map)  
+	w !!,"Full at step ",step
+	q
+read(map)
+	n x,y,line
 	w !,"Puzzle input:",!
 	f y=1:1:10 r line f x=1:1:10 s map(x,y)=$e(line,x)
-	f n=1:1:100 s total=total+$$step(.map)
-	w !,"Total flashes after ",n," steps: ",total
 	q
 step(map)
 	n x,y,flash,n
@@ -33,5 +46,12 @@ increment(map,flash,x,y)
 	. . s n=n+$$increment(.map,.flash,x,y+1)
 	. . s n=n+$$increment(.map,.flash,x+1,y+1)
 	q n
+full(map)
+	n x,y,full
+	s full=1
+	f y=1:1:10 d  q:'full
+	. f x=1:1:10 d  q:'full
+	. . i map(x,y)>0 s full=0
+	q full
 	q
 	;
