@@ -15,7 +15,7 @@ apply(template,rules)
 	. s new=new_$e(old,1)_$g(rules(old))
 	q new
 analyze(template)
-	n i,count,rank
+	n %,i,count,rank
 	f i=1:1:$l(template) s %=$i(count($e(template,i)))
 	s i=""
 	f  s i=$o(count(i)) q:i=""  s rank(count(i),i)=""
@@ -29,7 +29,7 @@ read(template,rules)
 	n ln,a,b
 	w !,"Puzzle input:"
 	r !,template
-	r !,%
+	r !,ln
 	f  r !,ln q:ln=""  d
 	. s a=$p(ln," ",1)
 	. s b=$p(ln," ",3)
