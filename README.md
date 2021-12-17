@@ -10,7 +10,7 @@ $ docker build -t yottadb/yottadb:latest .
 Then for each puzzle I work in a subdirectory and mount it as the `/data` mount for the YDB container:
 ```
 $ cd 9
-$ docker run -it --volume `pwd`:/data --rm  yottadb/yottadb:latest
+$ docker run -it --volume `pwd`:/data --user $(id -u):$(id -g) --rm  yottadb/yottadb:latest
 ```
 
 Finally, to recompile and execute the routine:
