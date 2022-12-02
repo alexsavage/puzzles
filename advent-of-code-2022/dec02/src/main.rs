@@ -14,6 +14,12 @@ enum Move {
     Scissors,
 }
 
+enum Outcome {
+    Win,
+    Lose,
+    Draw,
+}
+
 fn score_round(player: char, opponent: char) -> i32 {
     let player_move = match player {
         'X' => Move::Rock,
@@ -48,13 +54,56 @@ fn score_round(player: char, opponent: char) -> i32 {
     result
 }
 
+fn score_round_b(rig: char, opponent: char) -> i32 {
+    let opponent_move = match opponent {
+        'A' => Move::Rock,
+        'B' => Move::Paper,
+        'C' => Move::Scissors,
+        _ => panic!(),
+    };
+
+    let rig_outcome = match rig {
+        'X' => Outcome::Lose,
+        'Y' => Outcome::Draw,
+        'Z' => Outcome::Win,
+        _ => panic!(),
+    };
+
+    let mut result = match rig_outcome {
+        Outcome::Win => SCORE_WIN,
+        Outcome::Lose => SCORE_LOSE,
+        Outcome::Draw => SCORE_DRAW,
+    };
+
+    let player_move = match (opponent_move, rig_outcome) {
+        (Move::Rock, Outcome::Lose) => Move::Scissors,
+        (Move::Rock, Outcome::Win) => Move::Paper,
+        (Move::Paper, Outcome::Lose) => Move::Rock,
+        (Move::Paper, Outcome::Win) => Move::Scissors,
+        (Move::Scissors, Outcome::Lose) => Move::Paper,
+        (Move::Scissors, Outcome::Win) => Move::Rock,
+        (draw, _) => draw, // match to draw
+    };
+
+    result += match player_move {
+        Move::Rock => SCORE_ROCK,
+        Move::Paper => SCORE_PAPER,
+        Move::Scissors => SCORE_SCISSORS,
+    };
+
+    result
+}
+
 fn main() {
-    let mut score = 0;
+    let mut score_a = 0;
+    let mut score_b = 0;
     for line in stdin().lines().flatten() {
-        let opponent = line.chars().nth(0).unwrap();
-        let player = line.chars().nth(2).unwrap();
-        score += score_round(player,opponent);
+        let a = line.chars().nth(0).unwrap();
+        let b = line.chars().nth(2).unwrap();
+        score_a += score_round(b, a);
+        score_b += score_round_b(b, a);
     }
 
-    println!("Total score: {}", score);
+    println!("Part A score: {}", score_a);
+    println!("Part B score: {}", score_b);
 }
