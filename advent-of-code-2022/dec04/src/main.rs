@@ -1,19 +1,16 @@
 use regex::Regex;
-use std::io::stdin;
+use std::{io::stdin, ops::RangeInclusive};
 
-struct Plot {
-    start: u32,
-    end: u32,
+fn contains(a: &RangeInclusive<u32>, b: &RangeInclusive<u32>) -> bool {
+    if a.start() <= b.start() {
+        a.end() >= b.end() // &&
+    } else {
+        b.end() >= a.end() // && b.start() < a.start()
+    }
 }
 
-impl Plot {
-    fn contains(&self, other: &Plot) -> bool {
-        self.start <= other.start && self.end >= other.end
-    }
-
-    fn overlaps(&self, other: &Plot) -> bool {
-        self.start <= other.end && self.end >= other.start
-    }
+fn overlaps(a: &RangeInclusive<u32>, b: &RangeInclusive<u32>) -> bool {
+    a.start() <= b.end() && a.end() >= b.start()
 }
 
 fn main() {
@@ -24,20 +21,14 @@ fn main() {
 
     for line in stdin().lines().flatten() {
         let captures = re.captures(&line).unwrap();
-        let a = Plot {
-            start: captures[1].parse::<u32>().unwrap(),
-            end: captures[2].parse::<u32>().unwrap(),
-        };
-        let b = Plot {
-            start: captures[3].parse::<u32>().unwrap(),
-            end: captures[4].parse::<u32>().unwrap(),
-        };
+        let a: RangeInclusive<u32> = captures[1].parse().unwrap()..=captures[2].parse().unwrap();
+        let b: RangeInclusive<u32> = captures[3].parse().unwrap()..=captures[4].parse().unwrap();
 
-        if a.contains(&b) || b.contains(&a) {
+        if contains(&a, &b) || contains(&b, &a) {
             count1 += 1;
         }
 
-        if a.overlaps(&b) {
+        if overlaps(&a, &b) {
             count2 += 1;
         }
     }
