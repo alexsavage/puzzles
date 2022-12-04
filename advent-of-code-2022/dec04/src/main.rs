@@ -7,12 +7,8 @@ struct Plot {
 }
 
 impl Plot {
-    fn len(&self) -> u32 {
-        self.end - self.start
-    }
-
     fn contains(&self, other: &Plot) -> bool {
-        self.len() >= other.len() && self.start <= other.start && self.end >= other.end
+        self.start <= other.start && self.end >= other.end
     }
 
     fn overlaps(&self, other: &Plot) -> bool {
@@ -37,18 +33,12 @@ fn main() {
             end: captures[4].parse::<u32>().unwrap(),
         };
 
-        if a.overlaps(&b) {
-            count2 += 1;
+        if a.contains(&b) || b.contains(&a) {
+            count1 += 1;
         }
 
-        let (lhs, rhs) = match a.len().cmp(&b.len()) {
-            std::cmp::Ordering::Less => (b, a),
-            std::cmp::Ordering::Equal => (b, a),
-            std::cmp::Ordering::Greater => (a, b),
-        };
-
-        if lhs.contains(&rhs) {
-            count1 += 1;
+        if a.overlaps(&b) {
+            count2 += 1;
         }
     }
 
