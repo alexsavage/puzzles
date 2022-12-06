@@ -33,23 +33,22 @@ fn main() {
             }
             InputState::Moves => {
                 let moves = move_exp.captures(&line).unwrap();
-                let mut count = moves[1].parse::<usize>().unwrap();
+                let count = moves[1].parse::<usize>().unwrap();
                 let from = moves[2].parse::<usize>().unwrap() - 1;
                 let to = moves[3].parse::<usize>().unwrap() - 1;
 
-                while count > 0 {
-                    let x = ship[from].pop().unwrap();
-                    ship[to].push(x);
-                    count -= 1;
-                }
+                let mut pile = ship[from].clone();
+                let range = pile.len()-count..;
+                ship[to].push_str(pile.drain(range).as_str());
+                ship[from] = pile;
             }
         }
     }
-    let mut part1 = String::with_capacity(ship.len());
+    let mut result = String::with_capacity(ship.len());
     for pile in &ship {
         if let Some(base) = pile.chars().nth_back(0) {
-            part1.push(base);
+            result.push(base);
         }
     }
-    println!("Part 1: {}", part1);
+    println!("Result: {}", result);
 }
