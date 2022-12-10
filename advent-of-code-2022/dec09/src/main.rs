@@ -83,12 +83,15 @@ impl Point {
 }
 
 fn main() {
-    let mut mat = TriMat::new((usize::MAX, usize::MAX));
-    let mut head = Point { x: usize::MAX/2, y: usize::MAX/2 };
-    let mut tail: Point = Point { x: usize::MAX/2, y: usize::MAX/2 };
-    mat.add_triplet(tail.x, tail.y, 1);
+    let mut p = vec![Point { x: usize::MAX/2, y: usize::MAX/2 };10];
+
+    let mut part1 = TriMat::new((usize::MAX, usize::MAX));
+    part1.add_triplet(usize::MAX/2, usize::MAX/2, 1);
+    let mut part2 = TriMat::new((usize::MAX, usize::MAX));
+    part2.add_triplet(usize::MAX/2, usize::MAX/2, 1);
+
     for line in stdin().lines().flatten() {
-        let dir = match line.chars().next().unwrap() {
+        let direction = match line.chars().next().unwrap() {
             'U' => Move::Up,
             'D' => Move::Down,
             'L' => Move::Left,
@@ -96,18 +99,23 @@ fn main() {
             _ => panic!(),
         };
 
-        let steps: u32 = line[2..].parse().unwrap();
+        let steps: usize = line[2..].parse().unwrap();
 
         for _ in 0..steps {
-            head = head.shift(dir);
-            if let Some(chase) = tail.chase(&head) {
-                tail = tail.shift(chase);
-                if mat.find_locations(tail.y, tail.x).len() == 0 {
-                    mat.add_triplet(tail.y, tail.x, 1);
+            p[0] = p[0].shift(direction);
+            for i in 1..10 {
+                if let Some(direction) = p[i].chase(&p[i-1]) {
+                    p[i] = p[i].shift(direction);
+                    if i == 1 && part1.find_locations(p[i].y, p[i].x).len() == 0 {
+                        part1.add_triplet(p[i].y, p[i].x, 1);
+                    } else if i == 9 && part2.find_locations(p[i].y, p[i].x).len() == 0 {
+                        part2.add_triplet(p[i].y, p[i].x, 1);
+                    }
                 }
             }
         }
     }
 
-    println!("Part 1: {}", mat.nnz());
+    println!("Part 1: {}", part1.nnz());
+    println!("Part 2: {}", part2.nnz());
 }
