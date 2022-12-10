@@ -53,8 +53,6 @@ fn visible(grid: &Vec<Vec<u8>>, x: usize, y: usize) -> bool {
 }
 
 fn scenic_score(grid: &Vec<Vec<u8>>, x: usize, y: usize) -> usize {
-    let rows = grid.len();
-    let cols = grid[0].len();
     let a = grid[y][x];
 
     let mut score_up = 0;
@@ -62,7 +60,7 @@ fn scenic_score(grid: &Vec<Vec<u8>>, x: usize, y: usize) -> usize {
     // eprintln!("Evaluating [{},{}]={}",x,y,a);
 
     if y > 0 {
-        for y2 in (0..=y-1).rev() {
+        for y2 in (0..y).rev() {
             score_up += 1;
             // eprintln!("Up 1");
             if a <= grid[y2][x] {
@@ -73,7 +71,7 @@ fn scenic_score(grid: &Vec<Vec<u8>>, x: usize, y: usize) -> usize {
 
     let mut score_down = 0;
 
-    for y2 in y + 1..rows {
+    for y2 in y + 1..grid.len() {
         score_down += 1;
         if a <= grid[y2][x] {
             break;
@@ -83,7 +81,7 @@ fn scenic_score(grid: &Vec<Vec<u8>>, x: usize, y: usize) -> usize {
     let mut score_left = 0;
 
     if x > 0 {
-        for x2 in (0..=x-1).rev() {
+        for x2 in (0..x).rev() {
             score_left += 1;
             if a <= grid[y][x2] {
                 break;
@@ -92,23 +90,20 @@ fn scenic_score(grid: &Vec<Vec<u8>>, x: usize, y: usize) -> usize {
     }
 
     let mut score_right = 0;
-    for x2 in x + 1..cols {
+    for x2 in x + 1..grid[0].len() {
         score_right += 1;
         if a <= grid[y][x2] {
             break;
         }
     }
 
-    let scenic_score = score_up * score_down * score_left * score_right;
-    // eprintln!("Final score: {}u * {}d * {}l * {}r = {}s", score_up, score_down, score_left, score_right, scenic_score);
-
-    scenic_score
+    score_up * score_down * score_left * score_right
 }
 
 fn main() {
     let mut grid: Vec<Vec<u8>> = vec![];
     for line in stdin().lines().flatten() {
-        let new_row: Vec<u8> = line.bytes().map(|c| c - 30).collect();
+        let new_row: Vec<u8> = line.bytes().map(|c| c).collect();
         grid.push(new_row);
     }
 
