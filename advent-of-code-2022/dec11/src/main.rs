@@ -1,21 +1,22 @@
-use std::{collections::VecDeque, io::stdin};
+use std::collections::{HashSet, VecDeque};
+use std::io::stdin;
+use std::vec;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 enum Operator {
     Addition,
     Multiplication,
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 struct Operation {
     operator: Operator,
-    constant: Option<u32>,
+    constant: Option<u8>,
 }
 
-#[derive(Debug)]
 struct MonkeyDescription {
     operation: Operation,
-    target_divisor: u32,
+    target_divisor: u64,
     target_true: usize,
     target_false: usize,
 }
@@ -23,7 +24,7 @@ struct MonkeyDescription {
 impl MonkeyDescription {
     fn new(
         operation: Operation,
-        target_divisor: u32,
+        target_divisor: u64,
         target_true: usize,
         target_false: usize,
     ) -> Self {
@@ -42,12 +43,13 @@ fn main() {
 
     let mut line_number = 0;
 
-    let mut items: Vec<VecDeque<u32>> = vec![];
+    let mut items: Vec<VecDeque<u64>> = vec![];
     let mut operation: Operation = Operation {
         operator: Operator::Addition,
         constant: None,
     };
-    let mut target_divisor = u32::default();
+    let mut all_divisors: HashSet<u64> = HashSet::new();
+    let mut target_divisor = u64::default();
     let mut target_true = usize::default();
 
     for line in stdin().lines().flatten() {
@@ -60,7 +62,7 @@ fn main() {
             operation = match operation_string.next() {
                 Some("+") => Operation {
                     operator: Operator::Addition,
-                    constant: Some(operation_string.next().unwrap().parse::<u32>().unwrap()),
+                    constant: Some(operation_string.next().unwrap().parse::<u8>().unwrap()),
                 },
                 Some("*") => Operation {
                     operator: Operator::Multiplication,
@@ -78,6 +80,7 @@ fn main() {
             };
         } else if line_number == 4 {
             target_divisor = line[21..].parse().unwrap();
+            all_divisors.insert(target_divisor);
         } else if line_number == 5 {
             target_true = line[29..].parse().unwrap();
         } else if line_number == 6 {
@@ -94,43 +97,37 @@ fn main() {
         }
     }
 
-    for _round in 0..20 {
+    let common_multiple = all_divisors.drain().reduce(|a, x| a * x).unwrap();
+
+    for _round in 0..10000 as u16 {
         for i in 0..descriptions.len() {
-            // dbg!(i);
             let monkey = &descriptions[i];
-            // dbg!(monkey);
-            // dbg!(&items[i]);
             while let Some(old) = items[i].pop_front() {
-                // dbg!(old);
                 let new = match monkey.operation {
                     Operation {
                         operator: Operator::Addition,
                         constant: Some(x),
-                    } => old + x,
+                    } => old + x as u64,
                     Operation {
                         operator: Operator::Multiplication,
                         constant: Some(x),
-                    } => old * x,
+                    } => (old * x as u64) % common_multiple,
                     Operation {
                         operator: Operator::Multiplication,
                         constant: None,
-                    } => old.checked_mul(old).unwrap(),
+                    } => old.pow(2) % common_multiple,
                     _ => panic!(),
-                } / 3;
-                // dbg!(&items[i]);
-                // dbg!(new);
-                let j = match new % monkey.target_divisor {
-                    0 => monkey.target_true,
-                    _ => monkey.target_false,
+                };
+                let j = match new % monkey.target_divisor == 0 {
+                    true => monkey.target_true,
+                    false => monkey.target_false,
                 };
                 inspections[i] += 1;
                 items[j].push_back(new);
-                // dbg!(j);
-                // dbg!(&items[j]);
             }
         }
     }
 
     inspections.sort_unstable_by(|a, b| b.cmp(a));
-    println!("Part 1: {}", inspections[0] * inspections[1]);
+    println!("Part 2: {}", inspections[0] * inspections[1]);
 }
