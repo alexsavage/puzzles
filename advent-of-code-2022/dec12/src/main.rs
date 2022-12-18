@@ -20,16 +20,17 @@ fn main() {
                 'E' => 25,
                 c => (c as u8) - 97,
             });
-            distance[y].push(match c {
-                'S' => 0,
+            distance[y].push(match height[y][x] {
+                0 => 0,
                 _ => usize::MAX,
             });
 
             path[y].push(None);
 
-            if c == 'S' {
+            if height[y][x] == 0 {
                 queue.push_back((x, y));
             }
+            
             if c == 'E' {
                 end = (x, y);
             }
